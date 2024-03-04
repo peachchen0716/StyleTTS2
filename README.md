@@ -24,6 +24,17 @@ other_tts = tts.StyleTTS2(model_checkpoint_path='/PATH/TO/epochs_2nd_00020.pth',
 
 # Specify target voice to clone. When no target voice is provided, a default voice will be used.
 other_tts.inference("Hello there, I am now a python package.", target_voice_path="/PATH/TO/some_voice.wav", output_wav_file="another_test.wav")
+
+# To use the LJSpeech pre-trained model
+from cached_path import cached_path
+
+LJSpeech_TTS_CHECKPOINT_URL = "https://huggingface.co/yl4579/StyleTTS2-LJSpeech/resolve/main/Models/LJSpeech/epoch_2nd_00100.pth"
+LJSpeech_TTS_CONFIG_URL = "https://huggingface.co/yl4579/StyleTTS2-LJSpeech/resolve/main/Models/LJSpeech/config.yml?download=true"
+
+ljspeech_tts = tts.StyleTTS2(
+    model_checkpoint_path=cached_path(LJSpeech_TTS_CHECKPOINT_URL),
+    config_path=cached_path(LJSpeech_TTS_CONFIG_URL),
+)
 ```
 
 ## Inference function reference
