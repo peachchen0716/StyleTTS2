@@ -19,6 +19,10 @@ import numpy as np
 np.random.seed(0)
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+# Uncomment when running on Windows.
+# from phonemizer.backend.espeak.wrapper import EspeakWrapper
+# EspeakWrapper.set_library('C:\Program Files\eSpeak NG\libespeak-ng.dll')
+import phonemizer
 import yaml
 
 from . import models
@@ -228,8 +232,9 @@ class StyleTTS2:
 
         text = text.strip()
         text = text.replace('"', '')
-        phonemized_text = self.phoneme_converter.phonemize(text)
-        ps = word_tokenize(phonemized_text)
+        global_phonemizer = phonemizer.backend.EspeakBackend(language='en-us', preserve_punctuation=True,  with_stress=True)
+        ps = global_phonemizer.phonemize([text])
+        ps = word_tokenize(ps[0])
         phoneme_string = ' '.join(ps)
 
         textcleaner = TextCleaner()
