@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "styletts2"
-version = "0.1.6"
-description = "StyleTTS 2: Towards Human-Level Text-to-Speech through Style Diffusion and Adversarial Training with Large Speech Language Models. Original authors: Yinghao Aaron Li, Cong Han, Vinay S. Raghavan, Gavin Mischler, Nima Mesgarani. "
-authors = ["Sidharth Rajaram <rajaram@berkeley.edu>"]
-homepage = "https://github.com/sidharthrajaram/StyleTTS2"
-repository = "https://github.com/sidharthrajaram/StyleTTS2"
+name = "styletts2-fork"
+version = "0.0.1"
+description = "Fork of StyleTTS 2 Python packge. StyleTTS 2: Towards Human-Level Text-to-Speech through Style Diffusion and Adversarial Training with Large Speech Language Models. Original authors: Yinghao Aaron Li, Cong Han, Vinay S. Raghavan, Gavin Mischler, Nima Mesgarani, Sidharth Rajaram. "
+authors = ["Arthur Chen <peachchen0716@gmail.com>"]
+homepage = "https://github.com/peachchen0716/StyleTTS2-fork"
+repository = "https://github-com/peachchen0716/StyleTTS2-fork"
 license = "MIT"
 readme = "README.md"
 
@@ -43,7 +43,8 @@ networkx = "^2.8.8, <3.0.0"
 llvmlite = "^0.42.0"
 multidict = "^6.0.5"
 safetensors = "^0.4.2"
-tokenizers = "^0.15.1"
+tokenizers = "^0.15.2"
+phonemizer = "^3.2.1"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,5 +1,7 @@
 # StyleTTS 2: The Python Package
 
+This package is a fork from https://github.com/sidharthrajaram/StyleTTS2.
+
 This package makes StyleTTS2, an approach to human-level text-to-speech, accessible with an inference module that uses strictly MIT licensed libraries. See ***Conditions and Terms of Use***, ***Common Issues***, and ***Notes*** below.
 
 ## Quick Start
