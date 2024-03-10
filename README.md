@@ -9,7 +9,6 @@ This package makes StyleTTS2, an approach to human-level text-to-speech, accessi
 2. [Optional] Downloaded the StyleTTS2 LibriTTS checkpoint and corresponding config file. Both are available to download at https://huggingface.co/yl4579/StyleTTS2-LibriTTS. You can also provide paths to your own checkpoint and config file (just ensure it is the same format as the [original one](https://huggingface.co/yl4579/StyleTTS2-LibriTTS/blob/main/Models/LibriTTS/config.yml)).
 3. Install the package using pip:
 ```bash
-pip install setuptools
 pip install styletts2-fork
 ```
 For Windows user, set environment variable before using the library

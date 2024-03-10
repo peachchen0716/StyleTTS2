@@ -1,37 +1,23 @@
-from nltk.tokenize import word_tokenize
-import nltk
-nltk.download('punkt')
+import random
 
+from cached_path import cached_path
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from nltk.tokenize import word_tokenize
 from pathlib import Path
 import librosa
+import numpy as np
+import phonemizer
 import scipy
 import torch
 import torchaudio
-from cached_path import cached_path
-torch.manual_seed(0)
-torch.backends.cudnn.benchmark = False
-torch.backends.cudnn.deterministic = True
-
-import random
-random.seed(0)
-
-import numpy as np
-np.random.seed(0)
-
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-# Uncomment when running on Windows.
-# from phonemizer.backend.espeak.wrapper import EspeakWrapper
-# EspeakWrapper.set_library('C:\Program Files\eSpeak NG\libespeak-ng.dll')
-import phonemizer
 import yaml
 
 from . import models
 from . import utils
+from .Modules.diffusion.sampler import DiffusionSampler, ADPM2Sampler, KarrasSchedule
 from .phoneme import PhonemeConverterFactory
 from .text_utils import TextCleaner
 from .Utils.PLBERT.util import load_plbert
-from .Modules.diffusion.sampler import DiffusionSampler, ADPM2Sampler, KarrasSchedule
-
 
 LIBRI_TTS_CHECKPOINT_URL = "https://huggingface.co/yl4579/StyleTTS2-LibriTTS/resolve/main/Models/LibriTTS/epochs_2nd_00020.pth"
 LIBRI_TTS_CONFIG_URL = "https://huggingface.co/yl4579/StyleTTS2-LibriTTS/resolve/main/Models/LibriTTS/config.yml?download=true"
@@ -46,22 +32,11 @@ DEFAULT_TARGET_VOICE_URL = "https://styletts2.github.io/wavs/LJSpeech/OOD/GT/000
 
 SINGLE_INFERENCE_MAX_LEN = 420
 
-to_mel = torchaudio.transforms.MelSpectrogram(
-    n_mels=80, n_fft=2048, win_length=1200, hop_length=300)
-mean, std = -4, 4
-
 
 def length_to_mask(lengths):
     mask = torch.arange(lengths.max()).unsqueeze(0).expand(lengths.shape[0], -1).type_as(lengths)
     mask = torch.gt(mask+1, lengths.unsqueeze(1))
     return mask
-
-
-def preprocess(wave):
-    wave_tensor = torch.from_numpy(wave).float()
-    mel_tensor = to_mel(wave_tensor)
-    mel_tensor = (torch.log(1e-5 + mel_tensor.unsqueeze(0)) - mean) / std
-    return mel_tensor
 
 
 def segment_text(text):
@@ -77,6 +52,12 @@ def segment_text(text):
 
 class StyleTTS2:
     def __init__(self, model_checkpoint_path=None, config_path=None, phoneme_converter='gruut'):
+        random.seed(0)
+        np.random.seed(0)
+        torch.manual_seed(0)
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+
         self.model = None
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.phoneme_converter = PhonemeConverterFactory.load_phoneme_converter(phoneme_converter)
@@ -91,13 +72,15 @@ class StyleTTS2:
             clamp=False
         )
 
+        self.to_mel = torchaudio.transforms.MelSpectrogram(
+            n_mels=80, n_fft=2048, win_length=1200, hop_length=300)
 
     def load_model(self, model_path=None, config_path=None):
         """
         Loads model to prepare for inference. Loads checkpoints from provided paths or from local cache (or downloads
         default checkpoints to local cache if not present).
-        :param model_path: Path to LibriTTS StyleTTS2 model checkpoint (TODO: LJSpeech model support)
-        :param config_path: Path to LibriTTS StyleTTS2 model config JSON (TODO: LJSpeech model support)
+        :param model_path: Path to a StyleTTS2 model checkpoint
+        :param config_path: Path to a StyleTTS2 model config JSON
         :return:
         """
 
@@ -166,6 +149,13 @@ class StyleTTS2:
 
         return model
 
+    def preprocess(self, wave):
+        mean, std = -4, 4
+
+        wave_tensor = torch.from_numpy(wave).float()
+        mel_tensor = self.to_mel(wave_tensor)
+        mel_tensor = (torch.log(1e-5 + mel_tensor.unsqueeze(0)) - mean) / std
+        return mel_tensor
 
     def compute_style(self, path):
         """
@@ -178,14 +168,13 @@ class StyleTTS2:
         audio, index = librosa.effects.trim(wave, top_db=30)
         if sr != 24000:
             audio = librosa.resample(audio, sr, 24000)
-        mel_tensor = preprocess(audio).to(self.device)
+        mel_tensor = self.preprocess(audio).to(self.device)
 
         with torch.no_grad():
             ref_s = self.model.style_encoder(mel_tensor.unsqueeze(1))
             ref_p = self.model.predictor_encoder(mel_tensor.unsqueeze(1))
 
         return torch.cat([ref_s, ref_p], dim=1)
-
 
     def inference(self,
                   text: str,

@@ -1,5 +1,8 @@
+dist
+Include
 Lib
 Scripts
+share
 
 __pycache__
 pyvenv.cfg
