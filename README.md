@@ -6,7 +6,12 @@ This package makes StyleTTS2, an approach to human-level text-to-speech, accessi
 
 ## Quick Start
 1. Ensure you are running Python >= 3.9 (currently supports 3.9, 3.10 due to some other library dependencies)
-2. [Optional] Downloaded the StyleTTS2 LibriTTS checkpoint and corresponding config file. Both are available to download at https://huggingface.co/yl4579/StyleTTS2-LibriTTS. You can also provide paths to your own checkpoint and config file (just ensure it is the same format as the [original one](https://huggingface.co/yl4579/StyleTTS2-LibriTTS/blob/main/Models/LibriTTS/config.yml)).
+2. Install espeak (opensource synthesizer)
+- For Linux or Windows, install espeak-ng following [this guide](https://github.com/espeak-ng/espeak-ng/blob/master/docs/guide.md#installation) .
+- For MacOS user, install espeak instead via
+```bash
+brew install espeak
+```
 3. Install the package using pip:
 ```bash
 pip install styletts2-fork
@@ -15,8 +20,19 @@ For Windows user, set environment variable before using the library
 ```
 set PHONEMIZER_ESPEAK_LIBRARY="C:\Program Files\eSpeak NG\libespeak-ng.dll"""
 ```
+For MacOS user, set environment variable before using the library
+```
+set PHONEMIZER_ESPEAK_LIBRARY="/opt/local/bin/espeak"""
+```
 4. Try it out either in Python shell or in your code: 
 ```python
+# For Windows
+# from phonemizer.backend.espeak.wrapper import EspeakWrapper
+# EspeakWrapper.set_library('C:\Program Files\eSpeak NG\libespeak-ng.dll')
+
+# For MacOS
+# EspeakWrapper.set_library('/opt/local/bin/espeak')
+
 from styletts2_fork import tts
 
 # No paths provided means default checkpoints/configs will be downloaded/cached.

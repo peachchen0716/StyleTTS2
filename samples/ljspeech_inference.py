@@ -1,6 +1,9 @@
-# Uncomment when running on Windows.
 # from phonemizer.backend.espeak.wrapper import EspeakWrapper
+# Uncomment when running on Windows.
 # EspeakWrapper.set_library('C:\Program Files\eSpeak NG\libespeak-ng.dll')
+
+# Uncomment when running on MacOS.
+# EspeakWrapper.set_library('/opt/local/bin/espeak')
 
 from cached_path import cached_path
 from styletts2_fork import tts
